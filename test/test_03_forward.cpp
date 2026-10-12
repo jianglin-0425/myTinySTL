@@ -44,6 +44,13 @@ public:
     Widget(std::string&& s) {
         std::cout << "  [移动构造] 参数: " << s << "\n";
     }
+
+    Widget(int& x){
+        std::cout << "  [左值构造] 参数: \n";
+    }
+    Widget(int&& x) {
+        std::cout << "  [右值构造] 参数: \n";
+    }
 };
 
 // 完美转发的工厂函数
@@ -52,7 +59,7 @@ T* make(Args&&... args) {
     return new T(std::forward<Args>(args)...);
 }
 
-int main() {
+void test2(){
     std::string name = "hello";
 
     std::cout << "=== 传左值 name ===\n";
@@ -62,6 +69,60 @@ int main() {
     Widget* b = make<Widget>("world");    // 应走移动
 
     delete a; delete b;
+}
+// =================== Demo 3：完美转发的实际价值 —— 一个工厂函数 ==========
+template <class T1,class... Args>
+void bad_construct(T1* p,Args&&... args)
+{
+    ::new ((void*)p) T1(args...);
+}
+
+template <class T1,class... Args>
+void good_construct(T1* p,Args&&... args)
+{
+    ::new ((void*)p) T1(std::forward<Args>(args)...); // 使用forward
+}
+
+void test3(){
+    char buf[sizeof(Widget)];
+    Widget* p = reinterpret_cast<Widget*>(buf);
+
+    std::cout << "bad_construct(p, 42):\n";
+    bad_construct(p, 42);       // 传右值 42
+
+    std::cout << "good_construct(p, 42):\n";
+    good_construct(p, 42);      // 传右值 42
+}
+// =================== Demo 4：折叠规则 ==========
+/*
+        T& &    →  T&
+        T& &&   →  T&
+        T&& &   →  T&
+        T&& &&  →  T&&
+*/
+template<class T>
+void show(T&& arg)
+{
+    std::cout<<" T 是左值引用? "<<std::is_lvalue_reference<T>::value<<"\n";
+    std::cout<<" T 是右值引用? "<<std::is_rvalue_reference<T>::value<<"\n";
+    std::cout<<" 参数是左值引用? "<<std::is_lvalue_reference<decltype(arg)>::value<<"\n";
+    std::cout<<" 参数是右值引用? "<<std::is_rvalue_reference<decltype(arg)>::value<<"\n";
+}
+
+int main() {
+
+    int x = 5;
+    std::cout<<"==== 传左值 x =====\n";
+    show(x);
+    // T = int&  → T&& 折叠成 int&
+
+    std::cout << "=== 传右值 42 ===\n";
+    show(42);
+    // T = int   → T&& 就是 int&&
+
+    std::cout << "=== 传 std::move(x) ===\n";
+    show(std::move(x));
+    // T = int   → T&& = int&&
 
     return 0;
 }
