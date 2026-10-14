@@ -12,7 +12,7 @@ namespace mystl
 struct input_iterator_tag {};   // 输入迭代器
 struct output_iterator_tag {};  // 输出迭代器
 
-struct forward_iterator_tag:public input_iterator_tag{}; // 前向迭代器
+struct forward_iterator_tag : public input_iterator_tag {}; // 前向迭代器
 struct bidirectional_iterator_tag : public forward_iterator_tag {}; // 双向迭代器
 struct random_access_iterator_tag : public bidirectional_iterator_tag {}; // 随机访问迭代器
 

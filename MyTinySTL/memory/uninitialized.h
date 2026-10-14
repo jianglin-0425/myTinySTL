@@ -1,8 +1,0 @@
-//
-// Created by user1 on 2026/3/22.
-//
-
-#ifndef MYTINYSTL_UNINITIALIZED_H
-#define MYTINYSTL_UNINITIALIZED_H
-
-#endif //MYTINYSTL_UNINITIALIZED_H

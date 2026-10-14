@@ -10,14 +10,13 @@ add_executable(MyTinySTL main.cpp
         MyTinySTL/util.h
         algo.h
         MyTinySTL/basic_string.h
-        MyTinySTL/memory/construct.h
-        MyTinySTL/memory/alloc.h
-        MyTinySTL/memory/uninitialized.h
         MyTinySTL/iterator.h
         MyTinySTL/alloc.h
         MyTinySTL/allocator.h
         MyTinySTL/construct.h
         MyTinySTL/algobase.h
+        MyTinySTL/uninitialized.h
+        MyTinySTL/memory.h
 )
 
 
