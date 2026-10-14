@@ -29,3 +29,5 @@ add_executable(test_04_swap test/test_04_swap.cpp)
 
 add_executable(test_05_new test/test_05_new.cpp)
 add_executable(test_06_iterator test/test_06_iterator.cpp)
+
+add_executable(test_07_memory test/test_07_memory.cpp)
