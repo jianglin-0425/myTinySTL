@@ -17,6 +17,10 @@ add_executable(MyTinySTL main.cpp
         MyTinySTL/algobase.h
         MyTinySTL/uninitialized.h
         MyTinySTL/memory.h
+        MyTinySTL/exceptdef.h
+        MyTinySTL/vector.h
+        MyTinySTL/functional.h
+        MyTinySTL/heap_algo.h
 )
 
 
@@ -31,3 +35,6 @@ add_executable(test_05_new test/test_05_new.cpp)
 add_executable(test_06_iterator test/test_06_iterator.cpp)
 
 add_executable(test_07_memory test/test_07_memory.cpp)
+add_executable(test_08_functional test/test_08_functional.cpp)
+
+add_executable(test_09_heap test/test_09_heap.cpp)
