@@ -114,7 +114,7 @@ find(InputIter first,InputIter last,const T& value)
 /*****************************************************************************************/
 template <class InputIter,class UnaryPredicate>
 InputIter
-find_of(InputIter first,InputIter last,UnaryPredicate unary_pred)
+find_if(InputIter first,InputIter last,UnaryPredicate unary_pred)
 {
     while (first!=last && !unary_pred(*first))
         ++first;
@@ -127,7 +127,7 @@ find_of(InputIter first,InputIter last,UnaryPredicate unary_pred)
 /*****************************************************************************************/
 template <class InputIter,class UnaryPredicate>
 InputIter
-find_of_not(InputIter first,InputIter last,UnaryPredicate unary_pred)
+find_if_not(InputIter first,InputIter last,UnaryPredicate unary_pred)
 {
     while (first!=last && unary_pred(*first))
         ++first;
@@ -1028,6 +1028,595 @@ bool is_heap(RandomIter first,RandomIter last,Comparator comp)
     }
     return true;
 }
+
+/*****************************************************************************************/
+// is_sorted
+// 检查[first, last)内的元素是否升序，如果是升序，则返回 true
+/*****************************************************************************************/
+template <class ForwardIter>
+bool is_sorted(ForwardIter first,ForwardIter last)
+{
+    if(first==last)
+        return true;
+    auto next = first;
+    ++next;
+    for (; next !=last ; first=next,++next) {
+        if (*next < *first)
+            return false;
+    }
+    return true;
+}
+
+
+// 重载 使用函数对象 comp 代替比较操作
+template <class ForwardIter,class Comparator>
+bool is_sorted(ForwardIter first,ForwardIter last,Comparator comp)
+{
+    if(first==last)
+        return true;
+    auto next = first;
+    ++next;
+    for (; next != last ; first = next,++next) {
+        if(comp(*next,*first))
+            return false;
+    }
+    return true;
+}
+
+/*****************************************************************************************/
+// median
+// 找出三个值的中间值
+/*****************************************************************************************/
+template <class T>
+const T& median(const T& left, const T& mid, const T& right)
+{
+    if (left < mid)
+        if (mid < right)        // left < mid < right
+            return mid;
+        else if (left < right)  // left < right <= mid
+            return right;
+        else                    // right <= left < mid
+            return left;
+    else if (left < right)      // mid <= left < right
+        return left;
+    else if (mid < right)       // mid < right <= left
+        return right;
+    else                        // right <= mid <= left
+        return mid;
+}
+
+// 重载版本使用函数对象 comp 代替比较操作
+template <class T, class Compared>
+const T& median(const T& left, const T& mid, const T& right, Compared comp)
+{
+    if (comp(left, mid))
+        if (comp(mid, right))
+            return mid;
+        else if (comp(left, right))
+            return right;
+        else
+            return left;
+    else if (comp(left, right))
+        return left;
+    else if (comp(mid, right))
+        return right;
+    else
+        return mid;
+}
+
+/*****************************************************************************************/
+// max_element
+// 返回一个迭代器，指向序列中最大的元素
+/*****************************************************************************************/
+template <class ForwardIter>
+ForwardIter max_element(ForwardIter first,ForwardIter last)
+{
+    if(first == last)
+        return first;
+    auto result = first;
+    while (++first != last)
+    {
+        if(*result < *first)
+            result = first;
+    }
+    return result;
+}
+// 重载版本使用函数对象 comp 代替比较操作
+template <class ForwardIter, class Compared>
+ForwardIter max_element(ForwardIter first, ForwardIter last, Compared comp)
+{
+    if (first == last)
+        return first;
+    auto result = first;
+    while (++first != last)
+    {
+        if (comp(*result, *first))
+            result = first;
+    }
+    return result;
+}
+
+/*****************************************************************************************/
+// min_element
+// 返回一个迭代器，指向序列中最小的元素
+/*****************************************************************************************/
+template <class ForwardIter>
+ForwardIter min_elememt(ForwardIter first, ForwardIter last)
+{
+    if (first == last)
+        return first;
+    auto result = first;
+    while (++first != last)
+    {
+        if (*first < *result)
+            result = first;
+    }
+    return result;
+}
+
+// 重载版本使用函数对象 comp 代替比较操作
+template <class ForwardIter, class Compared>
+ForwardIter min_elememt(ForwardIter first, ForwardIter last, Compared comp)
+{
+    if (first == last)
+        return first;
+    auto result = first;
+    while (++first != last)
+    {
+        if (comp(*first, *result))
+            result = first;
+    }
+    return result;
+}
+
+/*****************************************************************************************/
+// swap_ranges
+// 将[first1, last1)从 first2 开始，交换相同个数元素
+// 交换的区间长度必须相同，两个序列不能互相重叠，返回一个迭代器指向序列二最后一个被交换元素的下一位置
+/*****************************************************************************************/
+template <class ForwardIter1,class ForwardIter2>
+ForwardIter2
+swap_ranges(ForwardIter1 first1,ForwardIter1 last1,
+            ForwardIter2 first2)
+{
+    for (;  first1 != last1 ; ++first1,++first2) {
+        mystl::iter_swap(first1,first2);
+    }
+    return first2;
+}
+
+/*****************************************************************************************/
+// transform
+// 第一个版本以函数对象 unary_op 作用于[first, last)中的每个元素并将结果保存至 result 中
+// 第二个版本以函数对象 binary_op 作用于两个序列[first1, last1)、[first2, last2)的相同位置
+/*****************************************************************************************/
+template <class InputIter,class OutputIter,class UnaryOperation>
+OutputIter
+transform(InputIter first,InputIter last,
+          OutputIter result,UnaryOperation unary_op)
+{
+    for (;  first != last ; ++first,++result) {
+        *result = unary_op(*first);
+    }
+    return result;
+}
+
+template <class InputIter1,class InputIter2,class OutputIter,class BinaryOperation>
+OutputIter
+transform(InputIter1 first1,InputIter1 last1,InputIter2 first2,OutputIter result,BinaryOperation binary_op)
+{
+    for (; first1!=last1  ; ++first1,++first2,++result)
+    {
+        *result = binary_op(*first1,*first2);
+    }
+    return result;
+}
+
+/*****************************************************************************************/
+// remove_copy
+// 移除区间内与指定 value 相等的元素，并将结果复制到以 result 标示起始位置的容器上
+/*****************************************************************************************/
+template <class InputIter,class OutputIter,class T>
+OutputIter
+remove_copy(InputIter first,InputIter last,OutputIter result,const T& value)
+{
+    for (; first != last ; ++first) {
+        if(*first  != value)
+        {
+            *result ++ *first;
+        }
+    }
+    return result;
+}
+/*****************************************************************************************/
+// remove_copy_if
+// 移除区间内所有令一元操作 unary_pred 为 true 的元素，并将结果复制到以 result 为起始位置的容器上
+/*****************************************************************************************/
+template <class InputIter,class OutputIter,class UnaryPredicate>
+OutputIter
+remove_copy_if(InputIter first,InputIter last,OutputIter result,UnaryPredicate unary_pre)
+{
+    for (; first != last ; ++first) {
+        if(!unary_pre(*first))
+        {
+            *result ++ *first;
+        }
+    }
+    return result;
+}
+
+/*****************************************************************************************/
+// remove
+// 移除所有与指定 value 相等的元素
+// 并不从容器中删除这些元素，所以 remove 和 remove_if 不适用于 array
+/*****************************************************************************************/
+template <class ForwardIter,class T>
+ForwardIter remove(ForwardIter first,ForwardIter last,const T& value)
+{
+    first = mystl::find(first,last,value);      // 利用 find 找出一个匹配的地方
+    auto next = first;
+    return first == last ? first : mystl::remove_copy(++next,last,first,value);
+}
+
+/*****************************************************************************************/
+// remove_if
+// 移除区间内所有令一元操作 unary_pred 为 true 的元素
+/*****************************************************************************************/
+template <class ForwardIter,class UnaryPredicate>
+ForwardIter
+remove_if(ForwardIter first,ForwardIter last,UnaryPredicate unary_pred)
+{
+    first = mystl::find_if(first,last,unary_pred);      // 利用 find_if 找出第一个匹配的地方
+    auto next = first;
+    return first = last?first:mystl::remove_copy_if(++next,last,first,unary_pred);
+}
+/*****************************************************************************************/
+// replace
+// 将区间内所有的 old_value 都以 new_value 替代
+/*****************************************************************************************/
+template <class ForwardIter,class T>
+void replace(ForwardIter first,ForwardIter last,
+             const T& old_value,const T& new_value)
+{
+    for (;first != last ; ++first) {
+        if(*first==old_value)
+            *first = new_value;
+    }
+}
+
+/*****************************************************************************************/
+// replace_if
+// 将区间内所有令一元操作 unary_pred 为 true 的元素都用 new_value 替代
+/*****************************************************************************************/
+template <class ForwardIter,class UnaryPredicate,class T>
+void replace_if(ForwardIter first,ForwardIter last,
+                UnaryPredicate unary_pred,const T& new_value)
+{
+    for (;first!=last;++first)
+    {
+        if(unary_pred(*first))
+            *first = new_value;
+    }
+}
+
+
+/*****************************************************************************************/
+// replace_copy
+// 行为与 replace 类似，不同的是将结果复制到 result 所指的容器中，原序列没有改变
+/*****************************************************************************************/
+template <class InputIter,class OutputIter,class T>
+OutputIter
+replace_copy(InputIter first,InputIter last,
+             OutputIter result,const T& old_value,const T& new_value)
+{
+    for (; first!=last ; ++first,++result) {
+        *result = *first == old_value ? new_value : *first;
+
+    }
+    return result;
+}
+/*****************************************************************************************/
+// replace_copy_if
+// 行为与 replace_if 类似，不同的是将结果复制到 result 所指的容器中，原序列没有改变
+/*****************************************************************************************/
+template <class InputIter,class OutputIter,class UnartPredicate,class T>
+OutputIter
+replace_copy_if(InputIter first,InputIter last,
+                OutputIter result,UnartPredicate unary_pred,const T& new_value)
+{
+    for (; first != last ; ++first,++result) {
+        *result = unary_pred(*first) ? new_value:*first;
+    }
+    return result;
+}
+
+/*****************************************************************************************/
+// reverse
+// 将[first, last)区间内的元素反转
+/*****************************************************************************************/
+// reverse_dispatch 的bidirectional_iterator_tag的版本
+template <class BidirectionalIter>
+void reverse_dispatch(BidirectionalIter first,BidirectionalIter last,
+                      bidirectional_iterator_tag)
+{
+    while (true)
+    {
+        if(first == last || first== -last)
+            return;
+        mystl::iter_swap(first++,last);
+    }
+}
+
+// reverse_dispatch 的 random_access_iterator_tag 版本
+template <class RandomIter>
+void reverse_dispatch(RandomIter first,RandomIter last,
+                      random_access_iterator_tag)
+{
+    while (first<last)
+    {
+        mystl::iter_swap(first++,--last);
+    }
+}
+
+template <class BidirectionalIter>
+void reverse(BidirectionalIter first,BidirectionalIter last)
+{
+    mystl::reverse_dispatch(first,last, iterator_category(first));
+}
+
+/*****************************************************************************************/
+// reverse_copy
+// 行为与 reverse 类似，不同的是将结果复制到 result 所指容器中
+/*****************************************************************************************/
+template <class BidirectionalIter,class OutputIter>
+OutputIter
+reverse_copy(BidirectionalIter first,BidirectionalIter last,
+             OutputIter result)
+{
+    while (first != last)
+    {
+        --last;
+        *result = *last;
+        ++result;
+    }
+    return result;
+}
+/*****************************************************************************************/
+// random_shuffle
+// 将[first, last)内的元素次序随机重排
+// 重载版本使用一个产生随机数的函数对象 rand
+/*****************************************************************************************/
+template <class RandomIter>
+void random_shuffle(RandomIter first,RandomIter last)
+{
+    if(first == last)
+        return;
+    srand(time(0));
+    for(auto i=first+1;i!=last;++i)
+    {
+        mystl::iter_swap(i,first+(rand() % (i-first +1)));
+    }
+}
+
+// 重载版本使用一个产生随机数的函数对象 rand
+template <class RandomIter,class RandomNumberGenerator>
+void random_shuffle(RandomIter first,RandomIter last,
+                    RandomNumberGenerator & rand)
+{
+    if(first == last)
+        return;
+    auto len = mystl::distance(first,last);
+    for(auto i=first+1;i!=last;++i)
+    {
+        mystl::iter_swap(i,first+(rand(i-first +1)%len));
+    }
+}
+
+/*****************************************************************************************/
+// rotate
+// 将[first, middle)内的元素和 [middle, last)内的元素互换，可以交换两个长度不同的区间
+// 返回交换后 middle 的位置
+// [1, 2 , | 3, 4, 5, 6] 互换变成 [3, 4, 5, 6, | 1, 2]
+/*****************************************************************************************/
+// rotate_dispatch 的 forward_iterator_tag 版本
+template <class ForwardIter>
+ForwardIter
+rotate_dispatch(ForwardIter first,ForwardIter middle,
+                ForwardIter last,forward_iterator_tag)
+{
+    auto first2 = middle;
+    do{
+        mystl::swap(*first++,*first2++);
+        if(first == middle)
+            middle = first2;
+    } while (first2 != last) ;      // 后半段移到前面
+
+    auto new_middle = first; // 迭代器返回的位置
+    first2 = middle;
+    while (first2 != last)
+    {
+        // 调整剩余元素
+        mystl::swap(*first++,*first2++);
+        if(first == middle)
+        {
+            middle = first2;
+        } else if(first2 == last)
+        {
+            first2 = middle;
+        }
+    }
+    return new_middle;
+}
+
+// rotate_dispatch 的 bidirectional_iterator_tag 版本
+template <class BidirectionalIter>
+    BidirectionalIter
+rotate_dispatch(BidirectionalIter first,BidirectionalIter middle,
+                BidirectionalIter last,bidirectional_iterator_tag)
+{
+    mystl::reverse_dispatch(first,middle,bidirectional_iterator_tag());
+    mystl::reverse_dispatch(middle,last,bidirectional_iterator_tag());
+
+    while (first != middle && middle != last)
+        mystl::swap(*first++,*--last);
+    if(first == middle)
+    {
+        mystl::reverse_dispatch(middle,last,bidirectional_iterator_tag());
+        return last;
+    } else{
+        mystl::reverse_dispatch(first,middle,bidirectional_iterator_tag());
+        return first;
+    }
+}
+
+/*****************************************************************************************/
+// “两个数的最大公因数，等于其中较小的数和两数相除余数的最大公因数。”
+//      公式表达就是：gcd(a, b) = gcd(b, a % b)。
+/*****************************************************************************************/
+template <class EulideanRingElement>
+EulideanRingElement rgcd(EulideanRingElement m,EulideanRingElement n)
+{
+    while (n !=0)
+    {
+        auto  t = m % n;
+        m = n;
+        n = t ;
+    }
+    return m;
+}
+
+// rotate_dispatch 的 random_access_iterator_tag 版本
+template < class RandomIter>
+RandomIter
+rotate_dispatch(RandomIter first,RandomIter middle,
+                RandomIter last,random_access_iterator_tag)
+{
+    // 因为是 random access iterator, 我们可以确定每个元素的位置
+    auto n = last - first;
+    auto l = middle - first;
+    auto r = n - l;
+    auto result = first +(last - middle);
+    if(l==r)
+    {
+        mystl::swap_ranges(first,middle,middle);
+        return result;
+    }
+    auto cycle_times = rgcd(n,l);
+    for (auto i= 0; i < cycle_times; ++i)
+    {
+        auto tmp = *first;
+        auto p = first;
+        if(l<r)
+        {
+            for (auto j = 0; j < r/cycle_times; ++j)
+            {
+                if(p>first + r)
+                {
+                    *p = *(p-r);
+                    p -= r;
+                }
+                *p= *(p+l);
+                p+=l;
+            }
+        }else
+        {
+            for (auto j = 0; j < l/cycle_times-1; ++j)
+            {
+                if(p<last-l)
+                {
+                    *p = *(p+l);
+                    p+=l;
+                }
+                *p = *(p-r);
+                p-=r;
+            }
+        }
+        *p = tmp;
+        ++first;
+    }
+    return result;
+}
+
+template <class ForwardIter>
+ForwardIter
+rotate(ForwardIter first,ForwardIter middle,ForwardIter last)
+{
+    if(first==middle)
+        return  last;
+    if (middle==last)
+        return first;
+    return mystl::rotate_dispatch(first,middle,last, iterator_category(first));
+}
+
+/*****************************************************************************************/
+// rotate_copy
+// 行为与 rotate 类似，不同的是将结果复制到 result 所指的容器中
+/*****************************************************************************************/
+template <class ForwardIter,class OutputIter>
+ForwardIter
+rotate_copy(ForwardIter first,ForwardIter middle,
+            ForwardIter last,OutputIter result)
+{
+    return mystl::copy(first,middle,mystl::copy(middle,last,result));
+}
+
+/*****************************************************************************************/
+// is_permutation
+// 判断[first1,last1)是否为[first2, last2)的排列组合
+//    序列 1：[1, 2, 3, 2, 4]
+//    序列 2：[2, 4, 1, 2, 3]
+//    这两个序列都包含 1 个 1，2 个 2，1 个 3，1 个 4，只是顺序被打乱了，因此它们是全排列
+/*****************************************************************************************/
+template <class ForwardIter1,class ForwardIter2,class BinaryPred>
+bool is_permutation_aux(ForwardIter1 first1,ForwardIter1 last1,
+                        ForwardIter2 first2,ForwardIter2 last2,
+                        BinaryPred pred)
+{
+    constexpr bool is_ra_it = mystl::is_random_access_iterator<ForwardIter1>::value
+            && mystl::is_random_access_iterator<ForwardIter2>::value;
+    if(is_ra_it)
+    {
+        auto len1 = last1 - first1;
+        auto len2 = last2 - first2;
+        if(len1 != len2)
+            return false;
+    }
+
+    // 找出相同的前缀段
+    for (;first1 != last1 && first2 != last2;++first1,(void)+=first2)
+    {
+        if(!pred(*first1,*first2))
+            break;
+    }
+    if (is_ra_it)
+    {
+        if(first1 == last1)
+            return true;
+    }
+    else
+    {
+        auto len1 = mystl::distance(first1,last1);
+        auto len2 = mystl::distance(first2,last2);
+        if(len1 == 0 && len2==0)
+            return true;
+        if(len1 != len2)
+            return false;
+    }
+    // 判断剩余部分
+    for(auto i = first1;i!=last1;++i)
+    {
+        bool is_repeated = false;
+        for (auto j = first1; j != i; ++j) {
+            if (pred(*j ,*i))
+            {
+                is_repeated = true;
+
+            }
+        }
+    }
+}
+
+
 
 
 }
