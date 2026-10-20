@@ -22,5 +22,5 @@
 #include "memory.h"
 #include "util.h"
 #include "exceptdef.h"
-#include "algo"
+#include "algo.h"
 #endif //MYTINYSTL_VECTOR_H

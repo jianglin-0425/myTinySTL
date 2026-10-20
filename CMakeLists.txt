@@ -21,6 +21,7 @@ add_executable(MyTinySTL main.cpp
         MyTinySTL/vector.h
         MyTinySTL/functional.h
         MyTinySTL/heap_algo.h
+        MyTinySTL/algo.h
 )
 
 

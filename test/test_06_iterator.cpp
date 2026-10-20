@@ -154,7 +154,30 @@ void test4(){
               << has_iterator_cat_of<ListIter, forward_iterator_tag>::value << "\n";
     // true
 }
-int main() {
 
+// ================= Demo5：反向跌打器的内部逻辑 ====================
+#include <vector>
+#include <iterator>
+int main() {
+    std::vector<int> v= {1,2,3,4,5};
+
+    // 手动reverset
+    std::reverse_iterator<std::vector<int>::iterator> rit(v.end());
+
+    std::cout<<"反向遍历: ";
+    while (rit != std::reverse_iterator<std::vector<int>::iterator>(v.begin()))
+    {
+        std::cout<<*rit<<" ";
+        ++rit;
+    }
+
+    std::cout << "\n";
+    // 输出: 5 4 3 2 1
+
+    // 验证 current 的位置
+    std::vector<int>::iterator forward = v.end();
+    std::reverse_iterator<std::vector<int>::iterator> r(forward);
+    std::cout<< "r.base()?"<<(r.base() == v.end()) << "\n";  // true
+    std::cout<<"*r= "<<*r << "\n";      // 5 (*(end()-1))
 }
 
