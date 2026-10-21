@@ -9,7 +9,8 @@
 
 namespace mystl
 {
-#define MYSTL_DEBUG(expr) \ assert(expr)
+#define MYSTL_DEBUG(expr) \
+ assert(expr)
 
 #define THROW_LENGTH_ERROR_IF(expr,what) \ if ((expr)) throw std::out_of_range(what)
 
