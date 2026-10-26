@@ -158,7 +158,7 @@ value_type(const Iterator&)
 // 以下函数用于计算迭代器间的距离
 // distance 的 input_iterator_tag 的版本
 template <class InputIterator>
-typename iterator_traits<InputIterator>::distance_type
+typename iterator_traits<InputIterator>::difference_type
 distance_dispatch(InputIterator first,InputIterator last,input_iterator_tag)
 {
     typename iterator_traits<InputIterator>::difference_type n = 0;
@@ -167,11 +167,11 @@ distance_dispatch(InputIterator first,InputIterator last,input_iterator_tag)
         ++first;
         ++n;
     }
-    return ;
+    return n;
 }
 // distance 的 random_access_iterator_tag 的版本
 template <class RandomIterator>
-typename iterator_traits<RandomIterator>::distance_type
+typename iterator_traits<RandomIterator>::difference_type
 distance_dispatch(RandomIterator first,RandomIterator last,random_access_iterator_tag)
 {
     return last-first;

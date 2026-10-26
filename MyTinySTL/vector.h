@@ -75,6 +75,9 @@ public:
     explicit vector(size_type n)
     { fill_init(n,value_type());}
 
+    vector(size_type n,const value_type& value)
+    { fill_init(n,value); }
+
     template<class Iter,typename std::enable_if<
     mystl::is_input_iterator<Iter>::value,int>::type = 0>
     vector(Iter first,Iter last)
@@ -212,7 +215,7 @@ public:
     //  push back/ pop back 在末尾添加/在末尾删除
     void push_back(const value_type& value);
     void push_back(value_type&& value)
-    { emplace_back(mystl::move_backward(value)); }
+    { emplace_back(mystl::move(value)); }
 
     void pop_back();
 
@@ -262,7 +265,7 @@ private:
     template<class Iter>
     void range_init(Iter first,Iter last);
 
-    void destory_and_recover(iterator first,iterator last,size_type n);
+    void destroy_and_recover(iterator first,iterator last,size_type n);
 
 
     // 计算增长的尺寸
@@ -329,7 +332,7 @@ vector<T> & vector<T>::operator=(const vector<T> &rhs)
 template <class T>
 vector<T>& vector<T>::operator=(vector&& rhs) noexcept
 {
-    destory_and_recover(begin_,end_,cap_-begin_);
+    destroy_and_recover(begin_,end_,cap_-begin_);
     begin_ = rhs.begin_;
     end_ = rhs.end_;
     cap_ = rhs.cap_;
@@ -349,7 +352,7 @@ void vector<T>::reserve(size_type n)
         const auto old_size = size();
         auto tmp = data_allocator::allocate(n);
         mystl::uninitialized_move(begin_,end_,tmp);
-        data_allocator::deallocate(begin_,cap_,begin_);
+        data_allocator::deallocate(begin_,cap_-begin_);
         begin_ = tmp;
         end_ = tmp + old_size;
         cap_ = begin_ + n;
@@ -388,7 +391,7 @@ vector<T>::emplace(const_iterator pos, Args &&...args)
         data_allocator::construct(mystl::address_of(*end_),*(end_ - 1));
         ++new_end;
         mystl::copy_backward(xpos,end_ - 1,end_);
-        *pos = value_type(mystl::forward<Args>(args)...);
+        *xpos = value_type(mystl::forward<Args>(args)...);
         end_ = new_end;
     }
     else
@@ -458,7 +461,7 @@ vector<T>::insert(const_iterator pos, const value_type& value)
         ++new_end;
         auto value_copy = value;        // 避免元素因以下复制操作而被改变
         mystl::copy_backward(xpos,end_ - 1,end_);
-        *pos =mystl::move(value_copy);
+        *xpos =mystl::move(value_copy);
         end_ = new_end;
     }
     else
@@ -572,13 +575,13 @@ range_init(Iter first,Iter last)
     const size_type len = mystl::distance(first,last);
     const size_type init_size = mystl::max(len,static_cast<size_type>(16));
     init_space(len,init_size);
-    mystl::unchecked_uninit_copy(first,last,begin_); // 将begin_的内容复制到first~last的空间上
+    mystl::uninitialized_copy(first,last,begin_); // 将 [first,last) 的内容复制到 begin_ 起始的空间上
 }
 
-// destory_and_recover 函数
+// destroy_and_recover 函数
 template <class T>
 void vector<T>::
-destory_and_recover(iterator first, iterator last, size_type n)
+destroy_and_recover(iterator first, iterator last, size_type n)
 {
     data_allocator::destroy(first,last);    // 调用析构
     data_allocator::deallocate(first,n);    // delete空间
@@ -744,7 +747,7 @@ void vector<T>::reallocate_insert(iterator pos, const value_type &value)
         data_allocator::deallocate(new_begin,new_size);
         throw ;
     }
-    destory_and_recover(begin_,end_,cap_ - begin_);
+    destroy_and_recover(begin_,end_,cap_ - begin_);
     begin_ = new_begin;
     end_ = new_end;
     cap_ = new_begin + new_size;
@@ -791,10 +794,10 @@ fill_insert(iterator pos, size_type n, const value_type &value)
         }
         catch(...)
         {
-            destory_and_recover(new_begin,new_end,new_size);
+            destroy_and_recover(new_begin,new_end,new_size);
             throw ;
         }
-        data_allocator::deallocate(begin_,cap_,cap_-begin_);
+        data_allocator::deallocate(begin_,cap_-begin_);
         begin_ = new_begin;
         end_ = new_end;
         cap_ = begin_ + new_size;
@@ -839,11 +842,11 @@ copy_insert(iterator pos, Iter first, Iter last)
         {
             new_end = mystl::uninitialized_move(begin_,pos,new_begin);
             new_end = mystl::uninitialized_copy(first,last,new_end);
-            new_end = mystl::uninitialized_move(first,end_,new_end);
+            new_end = mystl::uninitialized_move(pos,end_,new_end);
         }
         catch(...)
         {
-            destory_and_recover(new_begin,new_end,new_size);
+            destroy_and_recover(new_begin,new_end,new_size);
             throw ;
         }
         data_allocator::deallocate(begin_,cap_-begin_);
@@ -867,7 +870,7 @@ void vector<T>::reinsert(size_type size)
         throw ;
     }
 
-    data_allocator::deallocate(begin_,cap_,begin_);
+    data_allocator::deallocate(begin_,cap_-begin_);
     begin_ = new_begin;
     end_ = begin_+size;
     cap_ = begin_ + size;
