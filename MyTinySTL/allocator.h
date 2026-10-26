@@ -58,6 +58,11 @@ T* Allocator<T>::allocate(size_type n)
     return static_cast<T*>(::operator new(n * sizeof(T)));
 }
 
+/**
+ * 销毁容器
+ * @tparam T
+ * @param ptr
+ */
 template <class T>
 void Allocator<T>::deallocate(T *ptr)
 {

@@ -72,20 +72,20 @@ namespace mystl {
     }
 
 // ramdom_access_iterator_tag 版本
-    template<class RandomIter, class OutputIter>
-    OutputIter unchecked_copy_cat(RandomIter first, RandomIter last, OutputIter result,
-                                  mystl::random_access_iterator_tag) {
-        for (int n = last - first; n > 0; --n, ++first, ++result) {
-            *result = *first;
-        }
-        return result;
+template<class RandomIter, class OutputIter>
+OutputIter unchecked_copy_cat(RandomIter first, RandomIter last, OutputIter result,
+                              mystl::random_access_iterator_tag) {
+    for (int n = last - first; n > 0; --n, ++first, ++result) {
+        *result = *first;
     }
+    return result;
+}
 
-    template<class InputIter, class OutputIter>
-    OutputIter
-    unchecked_copy(InputIter first, InputIter last, OutputIter result) {
-        return unchecked_copy_cat(first, last, result, iterator_category(first));
-    }
+template<class InputIter, class OutputIter>
+OutputIter
+unchecked_copy(InputIter first, InputIter last, OutputIter result) {
+    return unchecked_copy_cat(first, last, result, iterator_category(first));
+}
 
 /**
  * is_trivially_copy_assignable: 判断"平凡拷贝赋值"
@@ -97,26 +97,26 @@ namespace mystl {
         没有被 delete 的拷贝赋值
  */
 // 为 trivially_copy_assignable 类型提供特化版本
-    template<class Tp, class Up>
-    typename std::enable_if<
-            std::is_same<typename std::remove_const<Tp>::type, Up>::value &&
-            std::is_trivially_copy_assignable<Up>::value,
-            Up *>::type
-    unchecked_copy(Tp *first, Tp *last, Up *result) {
-        // src:  [A][B][C][D]
-        // dest:       [A][B][C][D]   ← 重叠
-        // memcpy 按从前往后逐个字节（或按块）拷贝,当出现内存重叠时，会错误
-        // memmove 从后往前拷贝，避免覆盖未读数据
-        const auto n = static_cast<size_t>(last - first);
-        if (n != 0)
-            std::memmove(result, first, n * sizeof(Up));
-        return result + n;
-    }
+template<class Tp, class Up>
+typename std::enable_if<
+        std::is_same<typename std::remove_const<Tp>::type, Up>::value &&
+        std::is_trivially_copy_assignable<Up>::value,
+        Up *>::type
+unchecked_copy(Tp *first, Tp *last, Up *result) {
+    // src:  [A][B][C][D]
+    // dest:       [A][B][C][D]   ← 重叠
+    // memcpy 按从前往后逐个字节（或按块）拷贝,当出现内存重叠时，会错误
+    // memmove 从后往前拷贝，避免覆盖未读数据
+    const auto n = static_cast<size_t>(last - first);
+    if (n != 0)
+        std::memmove(result, first, n * sizeof(Up));
+    return result + n;
+}
 
-    template<class InputIter, class OutputIter>
-    OutputIter copy(InputIter first, InputIter last, OutputIter result) {
-        return unchecked_copy(first, last, result);
-    }
+template<class InputIter, class OutputIter>
+OutputIter copy(InputIter first, InputIter last, OutputIter result) {
+    return unchecked_copy(first, last, result);
+}
 
 /*****************************************************************************************/
 // copy_backward
