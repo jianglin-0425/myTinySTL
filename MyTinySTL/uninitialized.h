@@ -167,12 +167,13 @@ unchecked_uninit_fill_n(ForwardIter first,Size n,const T& value,std::false_type)
 }
 
 template <class ForwardIter,class Size,class T>
-void
+ForwardIter
 uninitialized_fill_n(ForwardIter first,Size n,const T& value)
 {
-    mystl::unchecked_uninit_fill_n(first,n,value,
+    return mystl::unchecked_uninit_fill_n(first,n,value,
                                  std::is_trivially_copy_assignable<
-                                         typename iterator_traits<ForwardIter>::value_type>{});
+                                         typename iterator_traits<ForwardIter>::
+                                                 value_type>{});
 }
 
 /*****************************************************************************************/

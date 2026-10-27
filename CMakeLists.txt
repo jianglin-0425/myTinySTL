@@ -41,5 +41,6 @@ add_executable(test_08_functional test/test_08_functional.cpp)
 add_executable(test_09_heap test/test_09_heap.cpp)
 
 
-add_executable(STLTest_01_vector test/stl_test/test_01_vector.cpp)
+add_executable(STLTest_01_vector test/stl_test/test_01_vector.cpp
+        test/stl_test/test.h)
 
