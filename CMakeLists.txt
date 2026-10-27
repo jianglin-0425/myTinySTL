@@ -22,6 +22,7 @@ add_executable(MyTinySTL main.cpp
         MyTinySTL/functional.h
         MyTinySTL/heap_algo.h
         MyTinySTL/algo.h
+        MyTinySTL/basic_string.h
 )
 
 
