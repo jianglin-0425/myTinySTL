@@ -206,7 +206,7 @@ OutputIter copy(InputIter first, InputIter last, OutputIter result) {
     template<class InputIter, class Size, class OutputIter>
     mystl::pair<InputIter, OutputIter>
     copy_n(InputIter first, Size n, OutputIter result) {
-        return unchecked_copy(first, n, result, iterator_category(first));
+        return unchecked_copy_n(first, n, result, iterator_category(first));
     }
 
 /*****************************************************************************************/

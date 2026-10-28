@@ -24,6 +24,11 @@
   std::cout << "\n";                                     \
 } while(0)
 
+#define STR_COUT(str) do {                               \
+  std::string str_name = #str;                           \
+  std::cout << " " << str_name << " : " << str << "\n";  \
+} while(0)
+
 
 // 输出容器调用函数的值
 #define FUN_VALUE(fun) do {                              \
@@ -39,6 +44,12 @@
   COUT(con);                                             \
 } while(0)
 
+#define STR_FUN_AFTER(str, fun) do {                     \
+  std::string fun_name = #fun;                           \
+  std::cout << " After " << fun_name << " :\n";          \
+  fun;                                                   \
+  STR_COUT(str);                                         \
+} while(0)
 
 // 简单测试的宏定义
 #define TEST(testcase_name) \

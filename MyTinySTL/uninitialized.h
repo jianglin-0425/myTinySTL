@@ -52,8 +52,9 @@ template <class InputIter,class ForwardIter>
 ForwardIter uninitialized_copy(InputIter first,InputIter last,ForwardIter result)
 {
     return mystl::unchecked_uninit_copy(first,last,result,
-                        std::is_trivially_copy_assignable<
-                                    typename iterator_traits<ForwardIter>::value_type>{});
+                                std::is_trivially_copy_assignable<
+                                typename iterator_traits<ForwardIter>::
+                                value_type>{});
 }
 
 /*****************************************************************************************/
