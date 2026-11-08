@@ -308,9 +308,9 @@ public:
 
     const_reverse_iterator rend() const noexcept { return reverse_iterator(begin()); }
 
-    const_iterator cbegin() const noexcept { return cbegin(); }
+    const_iterator cbegin() const noexcept { return node_->next; }
 
-    const_iterator cend() const noexcept { return cend(); }
+    const_iterator cend() const noexcept { return node_; }
 
     const_reverse_iterator crbegin() const noexcept { return rbegin(); }
 
@@ -437,6 +437,24 @@ public:
         emplace_back(mystl::move(value));
     }
 
+    // pop_front / pop_back
+    void pop_front()
+    {
+        MYSTL_DEBUG(!empty());
+        auto n = node_->next;
+        unlink_nodes(n,n);
+        destory_node(n->as_node());
+        --size_;
+    }
+    void pop_back()
+    {
+        MYSTL_DEBUG(!empty());
+        auto n = node_ -> prev;
+        unlink_nodes(n,n);
+        destory_node(n->as_node());
+        --size_;
+    }
+
     // erase / clear
     iterator erase(const_iterator pos);
 
@@ -481,7 +499,7 @@ public:
     { list_sort(begin(),end(),size(),mystl::less<T>());}
     template<class Compared>
     void sort(Compared comp)
-    { list_sort(begin(),end(),comp);}
+    { list_sort(begin(),end(),size(),comp);}
 
     void reverse();
 
@@ -597,7 +615,7 @@ void list<T>::resize(size_type new_size,const value_type& value)
 template <class T>
 void list<T>::splice(const_iterator pos, list<T> &other)
 {
-    MYSTL_DEBUG(this != other);
+    MYSTL_DEBUG(this != &other);
     if(!other.empty())
     {
         THROW_LENGTH_ERROR_IF(size_ > max_size() -other.size_,"list<T>'s size too big");
@@ -677,7 +695,7 @@ void list<T>::unique(UnaryPredicate pred)
     ++j;
     while (j != e)
     {
-        if(pred != e)
+        if(pred(*i,*j))
         {
             erase(j);
         }
@@ -921,7 +939,7 @@ template <class T>
 template <class Iter>
 void list<T>::copy_assign(Iter f2, Iter l2)
 {
-    auto f1 =begin();
+    auto f1 = begin();
     auto l1 = end();
     for (;f1 != l1 && f2 != l2;++f1,++f2)
     {
@@ -995,6 +1013,7 @@ list<T>::copy_insert(const_iterator pos, size_type n, Iter first)
         const auto add_size = n;
         auto node = create_node(*first);
         node->prev = nullptr;
+        r = iterator(node);
         iterator end = r;
         try {
             for (--n,++first;n>0;--n,++first,++end)
@@ -1046,7 +1065,7 @@ list<T>::list_sort(iterator f1,iterator l2, size_type n, Compared comp)
     auto n2 = n/2;
     auto l1 = f1;
     mystl::advance(l1,n2);
-    auto result = f1 - list_sort(f1,l1,n2,comp);        // 前半段的最小位置
+    auto result = f1 = list_sort(f1,l1,n2,comp);        // 前半段的最小位置
     auto f2 = l1 = list_sort(l1,l2,n-n2,comp);          // 后半段的最小位置
 
     // 把较小的一段区间移到前面
@@ -1085,7 +1104,7 @@ list<T>::list_sort(iterator f1,iterator l2, size_type n, Compared comp)
             if(l1 == f2)
                 l1 = m;
             f2 =m;
-            unlink_nodes(f1.node_,f,l);
+            unlink_nodes(f, l);
             m = f1;
             ++m;
             link_nodes(f1.node_,f,l);

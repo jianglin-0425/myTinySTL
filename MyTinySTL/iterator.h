@@ -25,7 +25,7 @@ struct iterator
     typedef T value_type;
     typedef Pointer pointer;
     typedef Reference reference;
-    typedef Distance distance_type;
+    typedef Distance difference_type;
 };
 
 template <class T>
@@ -58,8 +58,9 @@ struct iterator_traits_helper{};
 
 template <class Iterator>
 struct iterator_traits_helper<Iterator,true>
-        :public iterator_traits_impl<Iterator,std::is_convertible<typename Iterator::iterator_category,input_iterator_tag>::value||
-                std::is_convertible<typename Iterator::iterator_category,output_iterator_tag>::value>
+:public iterator_traits_impl<Iterator,
+std::is_convertible<typename Iterator::iterator_category,input_iterator_tag>::value||
+std::is_convertible<typename Iterator::iterator_category,output_iterator_tag>::value>
 {};
 
 // 萃取迭代器的特性

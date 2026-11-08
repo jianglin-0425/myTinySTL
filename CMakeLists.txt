@@ -50,3 +50,6 @@ add_executable(STLTest_01_vector test/stl_test/test_01_vector.cpp
 add_executable(STLTest_02_string test/stl_test/test_02_string.cpp
         test/stl_test/test.h)
 
+
+add_executable(STLTest_03_list test/stl_test/test_03_list.cpp
+        test/stl_test/test.h)
