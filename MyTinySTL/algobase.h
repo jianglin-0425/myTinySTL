@@ -145,7 +145,7 @@ OutputIter copy(InputIter first, InputIter last, OutputIter result) {
     BidirectionalIter2
     unchecked_copy_backward(BidirectionalIter1 first, BidirectionalIter1 last,
                             BidirectionalIter2 result) {
-        unchecked_copy_backward_cat(first, last, result, iterator_category(first));
+        return unchecked_copy_backward_cat(first, last, result, iterator_category(first));
     }
 
 // 为 trivially copy assignable 类型提供特化版本
