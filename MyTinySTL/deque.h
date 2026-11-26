@@ -590,17 +590,16 @@ template <class T>
 template <class ...Args>
 void deque<T>::emplace_back(Args &&...args)
 {
-    if(end_.cur != end_.first-1)
+    if(end_.cur != end_.last - 1)
     {
-        data_allocator::construct(end_.cur - 1,mystl::forward<Args>(args)...);
-        --end_.cur;
+        data_allocator::construct(end_.cur, mystl::forward<Args>(args)...);
+        ++end_.cur;
     }
     else
     {
         require_capacity(1, false);
-        data_allocator::construct(end_.cur,mystl::forward<Args>(args)...);
+        data_allocator::construct(end_.cur, mystl::forward<Args>(args)...);
         ++end_;
-
     }
 }
 
@@ -649,20 +648,20 @@ void deque<T>::push_front(const value_type &value)
     }
 }
 
-// 在头部插入元素
+// 在尾部插入元素
 template <class T>
 void deque<T>::push_back(const value_type &value)
 {
-    if(end_.cur != end_.first)
+    if(end_.cur != end_.last - 1)
     {
-        data_allocator::construct(end_.cur-1,value);
+        data_allocator::construct(end_.cur, value);
         ++end_.cur;
     }
     else
     {
         require_capacity(1, false);
-        data_allocator::construct(end_.cur,value);
-        --end_;
+        data_allocator::construct(end_.cur, value);
+        ++end_;
     }
 }
 // 弹出头部元素
@@ -683,12 +682,12 @@ void deque<T>::pop_front()
     }
 }
 
-// 弹出头部元素
+// 弹出尾部元素
 template <class T>
 void deque<T>::pop_back()
 {
     MYSTL_DEBUG(!empty());
-    if(end_.cur != end_.last - 1)
+    if(end_.cur != end_.first)
     {
         --end_.cur;
         data_allocator::destroy(end_.cur);
@@ -697,7 +696,7 @@ void deque<T>::pop_back()
     {
         --end_;
         data_allocator::destroy(end_.cur);
-        destroy_buffer(end_.node + 1,end_.node - 1);
+        destroy_buffer(end_.node + 1, end_.node + 1);
     }
 }
 
