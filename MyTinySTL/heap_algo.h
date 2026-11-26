@@ -142,7 +142,7 @@ void adjust_heap(RandomIter first,Distance holeIndex,
 }
 
 template <class RandomIter,class T,class Distance,class Comparator>
-void adjust_heap_aux(RandomIter first,RandomIter last,RandomIter result,
+void pop_heap_aux(RandomIter first,RandomIter last,RandomIter result,
                      T value,Distance* ,Comparator comp)
 {
     *result = *first;   // 先将尾指针设置为首值，即尾指针为欲求结果

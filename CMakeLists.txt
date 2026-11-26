@@ -26,6 +26,7 @@ add_executable(MyTinySTL main.cpp
         MyTinySTL/astring.h
         MyTinySTL/list.h
         MyTinySTL/deque.h
+        MyTinySTL/queue.h
 )
 
 
@@ -56,4 +57,10 @@ add_executable(STLTest_03_list test/stl_test/test_03_list.cpp
         test/stl_test/test.h)
 
 add_executable(STLTest_04_deque test/stl_test/test_04_deque.cpp
+        test/stl_test/test.h)
+
+add_executable(STLTest_05_queue test/stl_test/test_05_queue.cpp
+        test/stl_test/test.h)
+
+add_executable(STLTest_05_priority_queue test/stl_test/test_05_priority_queue.cpp
         test/stl_test/test.h)
